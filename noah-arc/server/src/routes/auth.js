@@ -48,6 +48,17 @@ router.post('/login', (req, res) => {
   res.json({ token, user: publicUser(user) });
 });
 
+router.post('/forgot-password', (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: 'email is required' });
+  const user = db.prepare('SELECT id FROM users WHERE email = ?').get(email.toLowerCase());
+  if (user) {
+    // In a real app, send a reset email here.
+    return res.json({ message: 'Password reset instructions have been sent if that email exists.' });
+  }
+  return res.json({ message: 'Password reset instructions have been sent if that email exists.' });
+});
+
 router.get('/me', requireAuth, (req, res) => {
   const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id);
   if (!user) return res.status(404).json({ error: 'User not found' });

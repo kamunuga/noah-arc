@@ -28,17 +28,29 @@ export function AuthProvider({ children }) {
   useEffect(() => { loadMe(); }, [loadMe]);
 
   async function login(email, password) {
-    const data = await api.post('/auth/login', { email, password });
-    setToken(data.token);
-    setUser(data.user);
-    return data.user;
+    try {
+      const data = await api.post('/auth/login', { email, password });
+      setToken(data.token);
+      setUser(data.user);
+      return data.user;
+    } catch (e) {
+      setToken(null);
+      setUser(null);
+      throw e;
+    }
   }
 
   async function register(payload) {
-    const data = await api.post('/auth/register', payload);
-    setToken(data.token);
-    setUser(data.user);
-    return data.user;
+    try {
+      const data = await api.post('/auth/register', payload);
+      setToken(data.token);
+      setUser(data.user);
+      return data.user;
+    } catch (e) {
+      setToken(null);
+      setUser(null);
+      throw e;
+    }
   }
 
   function logout() {
@@ -47,8 +59,15 @@ export function AuthProvider({ children }) {
   }
 
   async function refreshMe() {
-    const { user } = await api.get('/auth/me');
-    setUser(user);
+    try {
+      const { user } = await api.get('/auth/me');
+      setUser(user);
+      return user;
+    } catch (e) {
+      setToken(null);
+      setUser(null);
+      throw e;
+    }
   }
 
   return (

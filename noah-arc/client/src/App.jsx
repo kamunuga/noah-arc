@@ -15,6 +15,7 @@ import MyApplications from './pages/MyApplications';
 import MyPortfolio from './pages/MyPortfolio';
 import Bookings from './pages/Bookings';
 import Messages from './pages/Messages';
+import ForgotPassword from './pages/ForgotPassword';
 import Admin from './pages/Admin';
 import NotFound from './pages/NotFound';
 
@@ -25,6 +26,7 @@ export default function App() {
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/browse" element={<Browse />} />
         <Route path="/creatives/:id" element={<CreativeProfile />} />
         <Route path="/jobs" element={<JobBoard />} />

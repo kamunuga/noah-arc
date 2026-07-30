@@ -2,11 +2,32 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 import { useAuth } from '../AuthContext';
+import { defaultJobs } from '../mocks/sampleData';
+
+const RWF_RATE = 27; // Approximate NGN to RWF rate
+
+function parseBudget(raw) {
+  if (!raw) return null;
+  const digits = raw.replace(/[^\d.]/g, '');
+  const normalized = digits.replace(/,/g, '');
+  const amount = parseFloat(normalized);
+  if (Number.isNaN(amount)) return null;
+  return amount;
+}
+
+function formatBudget(raw, currency) {
+  const amount = parseBudget(raw);
+  if (amount === null) return raw;
+  const value = currency === 'RWF' ? Math.round(amount * RWF_RATE) : Math.round(amount / RWF_RATE);
+  const symbol = currency === 'RWF' ? 'RWF' : 'N';
+  return `${symbol}${value.toLocaleString()}`;
+}
 
 export default function JobBoard() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [jobs, setJobs] = useState([]);
+  const [jobs, setJobs] = useState(defaultJobs);
+  const [currency, setCurrency] = useState('NGN');
   const [q, setQ] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -18,9 +39,14 @@ export default function JobBoard() {
     setLoading(true);
     try {
       const data = await api.get(`/jobs${query ? `?q=${encodeURIComponent(query)}` : ''}`);
-      setJobs(data.jobs);
+      if (!query && Array.isArray(data.jobs) && data.jobs.length === 0) {
+        setJobs(defaultJobs);
+      } else {
+        setJobs(data.jobs || []);
+      }
     } catch (err) {
       setError(err.message);
+      setJobs(defaultJobs);
     } finally {
       setLoading(false);
     }
@@ -53,15 +79,32 @@ export default function JobBoard() {
         <p>Clients across Africa are posting creative work — apply directly with a proposal.</p>
       </div>
 
-      <form onSubmit={onSearch} style={{ display: 'flex', gap: 10, marginBottom: 32, maxWidth: 480 }}>
+      <form onSubmit={onSearch} style={{ display: 'flex', gap: 10, marginBottom: 16, maxWidth: 480, flexWrap: 'wrap' }}>
         <input
           value={q}
           onChange={e => setQ(e.target.value)}
           placeholder="Search jobs by title or category…"
-          style={{ flex: 1, background: 'var(--surface-raised)', border: '1px solid var(--line)', color: 'var(--text)', padding: '11px 14px', borderRadius: 8 }}
+          style={{ flex: 1, minWidth: 220, background: 'var(--surface-raised)', border: '1px solid var(--line)', color: 'var(--text)', padding: '11px 14px', borderRadius: 8 }}
         />
         <button className="btn btn-primary" type="submit">Search</button>
       </form>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center', marginBottom: 24 }}>
+        <span className="eyebrow" style={{ margin: 0 }}>Currency:</span>
+        <button
+          type="button"
+          className={currency === 'NGN' ? 'btn btn-primary btn-sm' : 'btn btn-outline btn-sm'}
+          onClick={() => setCurrency('NGN')}
+        >
+          NGN
+        </button>
+        <button
+          type="button"
+          className={currency === 'RWF' ? 'btn btn-primary btn-sm' : 'btn btn-outline btn-sm'}
+          onClick={() => setCurrency('RWF')}
+        >
+          RWF
+        </button>
+      </div>
 
       {error && <div className="error-banner">{error}</div>}
       {loading ? <div className="spinner" /> : jobs.length === 0 ? (
@@ -77,7 +120,7 @@ export default function JobBoard() {
               </p>
               {job.category && <span className="eyebrow" style={{ display: 'block', marginBottom: 8 }}>{job.category}</span>}
               <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{job.description}</p>
-              {job.budget && <p style={{ marginTop: 8, fontWeight: 600 }}>Budget: {job.budget}</p>}
+              {job.budget && <p style={{ marginTop: 8, fontWeight: 600 }}>Budget: {formatBudget(job.budget, currency)}</p>}
 
               {user?.role === 'creative' ? (
                 openJobId === job.id ? (

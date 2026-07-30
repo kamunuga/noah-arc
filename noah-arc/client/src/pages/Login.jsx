@@ -45,6 +45,9 @@ export default function Login() {
             {busy ? 'Logging in…' : 'Log in'}
           </button>
         </form>
+        <div style={{ marginTop: 14, textAlign: 'right' }}>
+          <Link to="/forgot-password" style={{ color: 'var(--gold-soft)', fontSize: '0.92rem' }}>Forgot password?</Link>
+        </div>
         <p className="text-muted" style={{ marginTop: 18, fontSize: '0.88rem' }}>
           New to Noah Arc? <Link to="/signup" style={{ color: 'var(--gold-soft)' }}>Create an account</Link>
         </p>

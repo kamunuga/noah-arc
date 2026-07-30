@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api/client';
+import { defaultPortfolios } from '../mocks/sampleData';
 
 export default function Browse() {
-  const [portfolios, setPortfolios] = useState([]);
+  const [portfolios, setPortfolios] = useState(defaultPortfolios);
   const [q, setQ] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -13,9 +14,14 @@ export default function Browse() {
     setError('');
     try {
       const data = await api.get(`/portfolios${query ? `?q=${encodeURIComponent(query)}` : ''}`);
-      setPortfolios(data.portfolios);
+      if (!query && Array.isArray(data.portfolios) && data.portfolios.length === 0) {
+        setPortfolios(defaultPortfolios);
+      } else {
+        setPortfolios(data.portfolios || []);
+      }
     } catch (err) {
       setError(err.message);
+      setPortfolios(defaultPortfolios);
     } finally {
       setLoading(false);
     }

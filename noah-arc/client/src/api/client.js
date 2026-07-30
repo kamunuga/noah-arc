@@ -28,7 +28,7 @@ async function request(path, { method = 'GET', body, auth = true } = {}) {
   }
 
   if (!res.ok) {
-    const message = (data && data.error) || `Request failed with status ${res.status}`;
+    const message = (data && data.error) || res.statusText || `Request failed with status ${res.status}`;
     throw new Error(message);
   }
   return data;

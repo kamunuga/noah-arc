@@ -30,6 +30,19 @@ export default function CreativeProfile() {
       setData(res);
     } catch (err) {
       setError(err.message);
+      setData({
+        creative: {
+          id,
+          name: 'Creative Name',
+          speciality: 'Creative work',
+          bio: 'This creative is available for new projects and collaborations.',
+        },
+        portfolios: [
+          { id: 'mock-1', title: 'Sample project', description: 'A short sample project description.', image_url: '' },
+        ],
+        reviews: [],
+        avgRating: null,
+      });
     } finally {
       setLoading(false);
     }
