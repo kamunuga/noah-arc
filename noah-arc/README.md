@@ -40,7 +40,7 @@ npm run dev:server
 npm run dev:client
 ```
 
-Open **http://localhost:5173** in your browser.
+Open **https://noah-arc-3.onrender.com** in your browser.
 
 On first boot, the server automatically creates an admin account:
 
